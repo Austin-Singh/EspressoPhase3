@@ -4,3 +4,4 @@ are two put both of the group member's info
 
 Name                    Student ID              e-mail
 ----------------------------------------------------------------------
+Vincent Mackenna        2001210089              mackev1@unlv.nevada.edu
