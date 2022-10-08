@@ -104,8 +104,7 @@ public class ClassAndMemberFinder extends Visitor {
 		this.debug = debug;
 	}
 
-
-	/** CLASS DECLARATION */
+	/** (1) CLASS DECLARATION */
 	public Object visitClassDecl(ClassDecl cd) {
 		println("ClassDecl:\t Inserting class '" + cd.name() +"' into global class table.");
 
@@ -146,13 +145,35 @@ public class ClassAndMemberFinder extends Visitor {
 
 		return null;
 	}
-	// YOUR CODE HERE
 
-	/** STATIC INITIALIZER - insert static initializer with name <clinit> */
+	/** (2) CONSTRUCTOR DECLARATION */
+	public Object visitConstructorDecl(ConstructorDecl cd) {
+		// insert into current class's method table
+		println("ConstructorDecl: Inserting constructor '<init>' with signature '" + cd.paramSignature() + "' (Parameters and Locals).");
+		addMethod(currentClass, cd, "<init>", cd.paramSignature());
+		return null;
+	}
+
+	/** (3) METHOD DECLARATION */
+	public Object visitMethodDecl(MethodDecl md) {
+		// insert into current class's method table
+		println("MethodDecl:\t Inserting method '" + md.getname() + "' with signature '" + md.paramSignature() + "' into method table for class '" + currentClass.name() + "'");
+		addMethod(currentClass, md, md.getname(), md.paramSignature());
+		return null;
+	}
+
+	/** (4) FIELD DECLARATION */
+	public Object visitFieldDecl(FieldDecl fd) {
+		// insert into current class's method table
+		println("FieldDecl:\t Inserting field '" + fd.getname() + "' into field table for class '" + currentClass.name() + "'");
+		addField(currentClass, fd, currentClass.name());
+		return null;
+	}
+
+	/** (5) STATIC INITIALIZER DELCARATION
+	 - insert static initializer with name <clinit> */
 	public Object visitStaticInitDecl(StaticInitDecl si) {
-		println("StaticInitDecl:\t Inserting <clinit> into method table for class '" + 
-				currentClass.name() + "'.");
-
+		println("StaticInitDecl:\t Inserting <clinit> into method table for class '" + currentClass.name() + "'.");
 		addMethod(currentClass, si, "<clinit>", "");
 		return null;
 	}
