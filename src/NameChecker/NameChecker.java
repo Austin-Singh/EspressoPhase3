@@ -51,7 +51,7 @@ public class NameChecker extends Visitor {
        they all return something of the same type. 
 	*/
     public void checkReturnTypesOfIdenticalMethods(Sequence lst) {
-	// YOUR CODE HERE
+		// YOUR CODE HERE
     }
     
     /* Divides all the methods into two sequences: one for all the
@@ -63,23 +63,23 @@ public class NameChecker extends Visitor {
     // sup is the class in which the abstract method lives,
     // sub is the class in which the concrete method lives.
     public static boolean isSuper(ClassDecl sup, ClassDecl sub) {
-	if (sup.name().equals(sub.name()))
-	    return true;
-		
-	if (sub.superClass() != null && isSuper(sup, sub.superClass().myDecl))
-	    return true;
+		if (sup.name().equals(sub.name()))
+			return true;
+			
+		if (sub.superClass() != null && isSuper(sup, sub.superClass().myDecl))
+			return true;
 
-	for (int i=0; i<sub.interfaces().nchildren; i++) 
-	    if (isSuper(sup, ((ClassType)sub.interfaces().children[i]).myDecl))
-		return true;
+		for (int i=0; i<sub.interfaces().nchildren; i++) 
+			if (isSuper(sup, ((ClassType)sub.interfaces().children[i]).myDecl))
+			return true;
 
-	return false;
+		return false;
     }
 
 
-       public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
-	   // YOUR CODE HERE
-       }
+	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
+		// YOUR CODE HERE
+	}
     
 	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
 		// YOUR CODE HERE
@@ -109,7 +109,7 @@ public class NameChecker extends Visitor {
 		this.debug = debug;
 	}
 
-	/** BLOCK */
+	/** (1) BLOCK */
 	public Object visitBlock(Block bl) {
 		println("Block:\t\t Creating new scope for Block.");
 		currentScope = currentScope.newScope();
@@ -118,8 +118,47 @@ public class NameChecker extends Visitor {
 		return null;
 	}
 
+	/** (2) FOR STAT */
+	public Object visitForStat(Block bl) {
+		// YOUR CODE HERE
+		println("ForStat:\t\t Creating new scope for ForStat.");
+		currentScope = currentScope.newScope();
+		super.visitBlock(bl);
+		currentScope = currentScope.closeScope(); 
+		return null;
+	}
 
-	/** CLASS DECLARATION */
+	/** (3) CONSTRUCTOR DECLARATION */
+	public Object visitConstructorDecl(Block bl) {
+		// YOUR CODE HERE
+		println("ConstructorDecl:\t\t Creating new scope for ConstructorDecl.");
+		currentScope = currentScope.newScope();
+		super.visitBlock(bl);
+		currentScope = currentScope.closeScope(); 
+		return null;
+	}
+
+	/** (4) METHOD DECLARATION */
+	public Object visitMethodDecl(Block bl) {
+		// YOUR CODE HERE
+		println("MethodDecl:\t\t Creating new scope for MethodDecl.");
+		currentScope = currentScope.newScope();
+		super.visitBlock(bl);
+		currentScope = currentScope.closeScope(); 
+		return null;
+	}
+
+	/** (5) SWITCH STAT */
+	public Object visitSwitchStat(Block bl) {
+		// YOUR CODE HERE
+		println("SwitchStat:\t\t Creating new scope for SwitchStat.");
+		currentScope = currentScope.newScope();
+		super.visitBlock(bl);
+		currentScope = currentScope.closeScope(); 
+		return null;
+	}
+
+	/** (6) CLASS DECLARATION */
 	public Object visitClassDecl(ClassDecl cd) {
 		println("ClassDecl:\t Visiting class '"+cd.name()+"'");
 
@@ -199,9 +238,65 @@ public class NameChecker extends Visitor {
 
 		return null;
 	}
-	// YOUR CODE HERE
 
-	/** THIS */
+	/** (7) LOCAL DELCARATION */
+	public Object visitLocalDecl(Block bl) {
+		// YOUR CODE HERE ("these are one liners")
+		return null;
+	}
+
+	/** (8) PARAM DELCARATION */
+	public Object visitParamDecl(Block bl) {
+		// YOUR CODE HERE ("these are one liners")
+		return null;
+	}
+
+	/** (9) NAME EXPRESSION */
+	public Object visitNameExpr(Block bl) {
+		// YOUR CODE HERE
+		/**
+			Could be the name of: LocalDecal, ParamDecl, FieldDecl, ClassDecal
+			NAME EXPRESSION: has a field called myDecl, set it euqal to the result of the lookup we get from below:
+
+			1) Look in the sym.tab chain (represented by CurrentScope)
+				- if we get null back, then we know it is not a LocalDecl.
+
+			2) Look in CurrentClass's Field Table
+				- if we we get null back, then look in global class table.
+					- if we get null back, throw an ERROR
+		*/
+
+		return null;
+	}
+
+	/** (10) INVOCATION */
+	public Object visitInvocation() {
+		// YOUR CODE HERE
+		// INOCATION: expr.function(...)
+		// we will end up calling getMethod()
+		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
+
+		return null;
+	}
+
+	/** (11) FIELD REFERENCE */
+	public Object visitFieldRef() {
+		// YOUR CODE HERE
+		// we will end up calling getField()
+		// FIELD REF: expr.field
+		// - you will never be in the situation where the target of the fieldref is null
+		// - expr can be anything only if it (target) is an instanceof this -> look in the table of currentClass (?)
+
+		return null;
+	}
+
+	/** (13) CLASS TYPE */
+	public Object visitClassType() {
+		// YOUR CODE HERE ("these are one liners")
+		return null;
+	}
+
+	/** (12) THIS */
 	public Object visitThis(This th) {
 		ClassType ct = new ClassType(new Name(new Token(16,currentClass.name(),0,0,0)));
 		ct.myDecl = currentClass;
