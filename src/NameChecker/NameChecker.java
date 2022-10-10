@@ -27,12 +27,12 @@ public class NameChecker extends Visitor {
 	 */    
 	public static SymbolTable getMethod(String methodName, ClassDecl cd) {
 
-		// OUR CODE HERE
+		// OUR CODE HERE - (COMPLETE)
 		if (cd.methodTable.get(methodName) != null) {
 			return (SymbolTable)cd.methodTable.get(methodName);
 		} 
 		else if (cd.superClass() != null) {
-			String superClassName = cd.superClass().toString();
+			String superClassName = cd.superClass().typeName();
 			SymbolTable result = getMethod(methodName, classTable.get(superClassName));
 			if (result != null) {
 				return result;
@@ -41,7 +41,7 @@ public class NameChecker extends Visitor {
 		else if (cd.interfaces() != null) {
 			Sequence interfaces = cd.interfaces();
 			for (int i = 0; i < interfaces.nchildren; i++) {
-				string interfaceName = interfaces.children[i].toString();
+				string interfaceName = interfaces.children[i].typeName();
 				SymbolTable result = getMethod(methodName, classTable.get(interfaceName));
 				if (result != null) {
 					return result;
@@ -57,12 +57,12 @@ public class NameChecker extends Visitor {
 	 */
 	public static AST getField(String fieldName, ClassDecl cd) {
 
-		// OUR CODE HERE
+		// OUR CODE HERE - (COMPLETE)
 		if (cd.fieldTable.get(fieldName) != null) {
 			return (SymbolTable)cd.fieldTable.get(fieldName);
 		} 
 		else if (cd.superClass() != null) {
-			String superClassName = cd.superClass().toString();
+			String superClassName = cd.superClass().typeName();
 			SymbolTable result = getField(fieldName, classTable.get(superClassName));
 			if (result != null) {
 				return result;
@@ -71,7 +71,7 @@ public class NameChecker extends Visitor {
 		else if (cd.interfaces() != null) {
 			Sequence interfaces = cd.interfaces();
 			for (int i = 0; i < interfaces.nchildren; i++) {
-				string interfaceName = interfaces.children[i].toString();
+				string interfaceName = interfaces.children[i].typeName();
 				SymbolTable result = getField(fieldName, classTable.get(interfaceName));
 				if (result != null) {
 					return result;
@@ -88,6 +88,7 @@ public class NameChecker extends Visitor {
 	 */
     public void getClassHierarchyMethods(ClassDecl cd, Sequence lst, Hashtable<String, Object> seenClasses) {
 		// OUR CODE HERE
+    	
     }
 
 	/* For each method (not constructors) in this list, check that if
@@ -100,7 +101,7 @@ public class NameChecker extends Visitor {
     
     /* Divides all the methods into two sequences: one for all the
        abstract ones, and one for all the concrete ones and check that
-       all the methods that were delcared abstract were indeed
+       all the methods that were declared abstract were indeed
        implemented somewhere in the class hierarchy.  */
     
 
@@ -289,7 +290,7 @@ public class NameChecker extends Visitor {
 		return null;
 	}
 
-	/** (7) LOCAL DELCARATION */
+	/** (7) LOCAL DECLARATION */
 	public Object visitLocalDecl(LocalDecl bl) {
 		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("LocalDecl:\t Declaring local symbol '" + bl.var() + "'.");
@@ -307,10 +308,10 @@ public class NameChecker extends Visitor {
 
 	/** (9) NAME EXPRESSION */
 	public Object visitNameExpr(NameExpr bl) {
-		// OUR CODE HERE
+		// OUR CODE HERE - (COMPLETE) should it just be objects?
 		/**
-			Could be the name of: LocalDecal, ParamDecl, FieldDecl, ClassDecal
-			NAME EXPRESSION: has a field called myDecl, set it euqal to the result of the lookup we get from below:
+			Could be the name of: LocalDecl, ParamDecl, FieldDecl, ClassDecal
+			NAME EXPRESSION: has a field called myDecl, set it equal to the result of the lookup we get from below:
 
 			1) Look in the sym.tab chain (represented by CurrentScope)
 				- if we get null back, then we know it is not a LocalDecl.
@@ -323,7 +324,29 @@ public class NameChecker extends Visitor {
 			1) "NameExpr:        Looking up symbol 'a'."
 			2) "Found Local Variable"
 		*/
-
+		println("NameExpr: Looking up symbol " + bl.name().getname());
+		Object obj = currentScope.get(bl.name().getname());
+		if (obj != null) {
+			println("Found Local Variable");
+			bl.myDecl = obj;
+		}
+		else {
+			obj = currentClass.fieldTable.get(bl.name().getname());
+			if (obj != null) {
+				println("Found Field Variable");
+				bl.myDecl = obj;
+			} 
+			else {
+				obj = classTable.get(bl.name().getname());
+				if (obj != null) {
+					println("Found Class Variable");
+					bl.myDecl = obj;
+				} 
+				else {
+				Error.error(bl, "NameExpr: " + bl.name().getname() + " not found.");
+				}
+			}
+		}
 		return null;
 	}
 
@@ -333,7 +356,7 @@ public class NameChecker extends Visitor {
 		// INOCATION: expr.function(...)
 		// we will end up calling getMethod()
 		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
-
+		
 		return null;
 	}
 
@@ -344,7 +367,7 @@ public class NameChecker extends Visitor {
 		// FIELD REF: expr.field
 		// - you will never be in the situation where the target of the fieldref is null
 		// - expr can be anything only if it (target) is an instanceof this -> look in the table of currentClass (?)
-
+		
 		return null;
 	}
 
