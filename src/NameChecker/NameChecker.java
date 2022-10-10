@@ -28,7 +28,29 @@ public class NameChecker extends Visitor {
 	public static SymbolTable getMethod(String methodName, ClassDecl cd) {
 
 		// OUR CODE HERE
-		return null;
+		if (cd.methodTable.get(methodName) != null) {
+			return (SymbolTable)cd.methodTable.get(methodName);
+		} 
+		else if (cd.superClass() != null) {
+			String superClassName = cd.superClass().toString();
+			SymbolTable result = getMethod(methodName, classTable.get(superClassName));
+			if (result != null) {
+				return result;
+			}
+		}
+		else if (cd.interfaces() != null) {
+			Sequence interfaces = cd.interfaces();
+			for (int i = 0; i < interfaces.nchildren; i++) {
+				string interfaceName = interfaces.children[i].toString();
+				SymbolTable result = getMethod(methodName, classTable.get(interfaceName));
+				if (result != null) {
+					return result;
+				}
+			}
+		}
+		else {
+			return null;
+		}
 	}
 
 	/* Same as getMethod just for fields instead 
@@ -36,7 +58,29 @@ public class NameChecker extends Visitor {
 	public static AST getField(String fieldName, ClassDecl cd) {
 
 		// OUR CODE HERE
-		return null;
+		if (cd.fieldTable.get(fieldName) != null) {
+			return (SymbolTable)cd.fieldTable.get(fieldName);
+		} 
+		else if (cd.superClass() != null) {
+			String superClassName = cd.superClass().toString();
+			SymbolTable result = getField(fieldName, classTable.get(superClassName));
+			if (result != null) {
+				return result;
+			}
+		}
+		else if (cd.interfaces() != null) {
+			Sequence interfaces = cd.interfaces();
+			for (int i = 0; i < interfaces.nchildren; i++) {
+				string interfaceName = interfaces.children[i].toString();
+				SymbolTable result = getField(fieldName, classTable.get(interfaceName));
+				if (result != null) {
+					return result;
+				}
+			}
+		}
+		else {
+			return null;
+		}
 	}
 
 	/* Traverses all the classes and interfaces and builds a sequence
