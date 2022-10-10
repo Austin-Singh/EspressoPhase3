@@ -151,6 +151,7 @@ public class ClassAndMemberFinder extends Visitor {
 		// insert into current class's method table
 		println("ConstructorDecl: Inserting constructor '<init>' with signature '" + cd.paramSignature() + "' (Parameters and Locals).");
 		addMethod(currentClass, cd, "<init>", cd.paramSignature());
+		super.visitConstructorDecl(cd);
 		return null;
 	}
 
@@ -159,6 +160,7 @@ public class ClassAndMemberFinder extends Visitor {
 		// insert into current class's method table
 		println("MethodDecl:\t Inserting method '" + md.getname() + "' with signature '" + md.paramSignature() + "' into method table for class '" + currentClass.name() + "'");
 		addMethod(currentClass, md, md.getname(), md.paramSignature());
+		super.visitMethodDecl(md);
 		return null;
 	}
 
@@ -167,6 +169,9 @@ public class ClassAndMemberFinder extends Visitor {
 		// insert into current class's method table
 		println("FieldDecl:\t Inserting field '" + fd.getname() + "' into field table for class '" + currentClass.name() + "'");
 		addField(currentClass, fd, currentClass.name());
+		fd.fieldNumber = fieldNumber;
+		fieldNumber++;
+		super.visitFieldDecl(fd);
 		return null;
 	}
 
@@ -175,6 +180,7 @@ public class ClassAndMemberFinder extends Visitor {
 	public Object visitStaticInitDecl(StaticInitDecl si) {
 		println("StaticInitDecl:\t Inserting <clinit> into method table for class '" + currentClass.name() + "'.");
 		addMethod(currentClass, si, "<clinit>", "");
+		super.visitStaticInitDecl(si);
 		return null;
 	}
 }
