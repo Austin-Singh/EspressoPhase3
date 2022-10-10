@@ -1,5 +1,2 @@
 #!/bin/sh
 java -cp bin/:src/Utilities/java_cup_runtime.jar Espressoc -I Include/ -Tsymbol -P:3 $@
-
-# This is a test.
-# Testing ignore file feature.

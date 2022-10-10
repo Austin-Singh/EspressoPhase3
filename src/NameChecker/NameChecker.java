@@ -119,41 +119,41 @@ public class NameChecker extends Visitor {
 	}
 
 	/** (2) FOR STAT */
-	public Object visitForStat(Block bl) {
+	public Object visitForStat(ForStat bl) {
 		// YOUR CODE HERE
-		println("ForStat:\t\t Creating new scope for ForStat.");
+		println("ForStat:\t\t Creating new scope for For Statement.");
 		currentScope = currentScope.newScope();
-		super.visitBlock(bl);
+		super.visitForStat(bl);
 		currentScope = currentScope.closeScope(); 
 		return null;
 	}
 
 	/** (3) CONSTRUCTOR DECLARATION */
-	public Object visitConstructorDecl(Block bl) {
+	public Object visitConstructorDecl(ConstructorDecl bl) {
 		// YOUR CODE HERE
-		println("ConstructorDecl:\t\t Creating new scope for ConstructorDecl.");
+		println("ConstructorDecl: Creating new scope for constructor <init> with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
-		super.visitBlock(bl);
+		super.visitConstructorDecl(bl);
 		currentScope = currentScope.closeScope(); 
 		return null;
 	}
 
 	/** (4) METHOD DECLARATION */
-	public Object visitMethodDecl(Block bl) {
+	public Object visitMethodDecl(MethodDecl bl) {
 		// YOUR CODE HERE
-		println("MethodDecl:\t\t Creating new scope for MethodDecl.");
+		println("MethodDecl:\t Creating new scope for Method '"+ bl.getname() + "' with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
-		super.visitBlock(bl);
+		super.visitMethodDecl(bl);
 		currentScope = currentScope.closeScope(); 
 		return null;
 	}
 
 	/** (5) SWITCH STAT */
-	public Object visitSwitchStat(Block bl) {
+	public Object visitSwitchStat(SwitchStat bl) {
 		// YOUR CODE HERE
 		println("SwitchStat:\t\t Creating new scope for SwitchStat.");
 		currentScope = currentScope.newScope();
-		super.visitBlock(bl);
+		super.visitSwitchStat(bl);
 		currentScope = currentScope.closeScope(); 
 		return null;
 	}
@@ -240,19 +240,20 @@ public class NameChecker extends Visitor {
 	}
 
 	/** (7) LOCAL DELCARATION */
-	public Object visitLocalDecl(Block bl) {
+	public Object visitLocalDecl(LocalDecl bl) {
 		// YOUR CODE HERE ("these are one liners")
+		println("LocalDecl:\t  Declaring local symbol '" + bl.var() + "'.");
 		return null;
 	}
 
 	/** (8) PARAM DELCARATION */
-	public Object visitParamDecl(Block bl) {
+	public Object visitParamDecl(ParamDecl bl) {
 		// YOUR CODE HERE ("these are one liners")
 		return null;
 	}
 
 	/** (9) NAME EXPRESSION */
-	public Object visitNameExpr(Block bl) {
+	public Object visitNameExpr(NameExpr bl) {
 		// YOUR CODE HERE
 		/**
 			Could be the name of: LocalDecal, ParamDecl, FieldDecl, ClassDecal
@@ -264,6 +265,10 @@ public class NameChecker extends Visitor {
 			2) Look in CurrentClass's Field Table
 				- if we we get null back, then look in global class table.
 					- if we get null back, throw an ERROR
+
+			STRING OUTPUT IN REFERENCE COMPILER OUTPUT
+			1) "NameExpr:        Looking up symbol 'a'."
+			2_ "Found Local Variable"
 		*/
 
 		return null;
@@ -291,8 +296,9 @@ public class NameChecker extends Visitor {
 	}
 
 	/** (13) CLASS TYPE */
-	public Object visitClassType() {
+	public Object visitClassType(ClassType bl) {
 		// YOUR CODE HERE ("these are one liners")
+		println("ClassType:\t  Looking up class/interface '" + bl.typeName() + "' in class table.");
 		return null;
 	}
 
