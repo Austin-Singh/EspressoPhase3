@@ -271,7 +271,7 @@ public class NameChecker extends Visitor {
 
 			STRING OUTPUT IN REFERENCE COMPILER OUTPUT
 			1) "NameExpr:        Looking up symbol 'a'."
-			2_ "Found Local Variable"
+			2) "Found Local Variable"
 		*/
 
 		return null;
@@ -300,8 +300,9 @@ public class NameChecker extends Visitor {
 
 	/** (13) CLASS TYPE */
 	public Object visitClassType(ClassType bl) {
-		// OUR CODE HERE ("these are one liners")
+		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("ClassType:\t Looking up class/interface '" + bl.typeName() + "' in class table.");
+		classTable.get(bl.typeName());
 		return null;
 	}
 
