@@ -27,7 +27,7 @@ public class NameChecker extends Visitor {
 	 */    
 	public static SymbolTable getMethod(String methodName, ClassDecl cd) {
 
-		// YOUR CODE HERE
+		// OUR CODE HERE
 		return null;
 	}
 
@@ -35,7 +35,7 @@ public class NameChecker extends Visitor {
 	 */
 	public static AST getField(String fieldName, ClassDecl cd) {
 
-		// YOUR CODE HERE
+		// OUR CODE HERE
 		return null;
 	}
 
@@ -43,7 +43,7 @@ public class NameChecker extends Visitor {
 	   of the methods and constructors of the class hierarchy.
 	 */
     public void getClassHierarchyMethods(ClassDecl cd, Sequence lst, Hashtable<String, Object> seenClasses) {
-		// YOUR CODE HERE
+		// OUR CODE HERE
     }
 
 	/* For each method (not constructors) in this list, check that if
@@ -51,7 +51,7 @@ public class NameChecker extends Visitor {
        they all return something of the same type. 
 	*/
     public void checkReturnTypesOfIdenticalMethods(Sequence lst) {
-		// YOUR CODE HERE
+		// OUR CODE HERE
     }
     
     /* Divides all the methods into two sequences: one for all the
@@ -78,11 +78,11 @@ public class NameChecker extends Visitor {
 
 
 	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
-		// YOUR CODE HERE
+		// OUR CODE HERE
 	}
     
 	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
-		// YOUR CODE HERE
+		// OUR CODE HERE
 	}
 
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,7 +120,7 @@ public class NameChecker extends Visitor {
 
 	/** (2) FOR STAT */
 	public Object visitForStat(ForStat bl) {
-		// YOUR CODE HERE
+		// OUR CODE HERE (COMPLETE)
 		println("ForStat:\t\t Creating new scope for For Statement.");
 		currentScope = currentScope.newScope();
 		super.visitForStat(bl);
@@ -130,7 +130,7 @@ public class NameChecker extends Visitor {
 
 	/** (3) CONSTRUCTOR DECLARATION */
 	public Object visitConstructorDecl(ConstructorDecl bl) {
-		// YOUR CODE HERE
+		// OUR CODE HERE (COMPLETE)
 		println("ConstructorDecl: Creating new scope for constructor <init> with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
 		super.visitConstructorDecl(bl);
@@ -140,7 +140,7 @@ public class NameChecker extends Visitor {
 
 	/** (4) METHOD DECLARATION */
 	public Object visitMethodDecl(MethodDecl bl) {
-		// YOUR CODE HERE
+		// OUR CODE HERE (COMPLETE)
 		println("MethodDecl:\t Creating new scope for Method '"+ bl.getname() + "' with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
 		super.visitMethodDecl(bl);
@@ -150,7 +150,7 @@ public class NameChecker extends Visitor {
 
 	/** (5) SWITCH STAT */
 	public Object visitSwitchStat(SwitchStat bl) {
-		// YOUR CODE HERE
+		// OUR CODE HERE (COMPLETE)
 		println("SwitchStat:\t\t Creating new scope for SwitchStat.");
 		currentScope = currentScope.newScope();
 		super.visitSwitchStat(bl);
@@ -241,20 +241,23 @@ public class NameChecker extends Visitor {
 
 	/** (7) LOCAL DELCARATION */
 	public Object visitLocalDecl(LocalDecl bl) {
-		// YOUR CODE HERE ("these are one liners")
-		println("LocalDecl:\t  Declaring local symbol '" + bl.var() + "'.");
+		// OUR CODE HERE ("these are one liners") - (COMPLETE)
+		println("LocalDecl:\t Declaring local symbol '" + bl.var() + "'.");
+		currentScope.put(bl.name(), this);
 		return null;
 	}
 
 	/** (8) PARAM DELCARATION */
 	public Object visitParamDecl(ParamDecl bl) {
-		// YOUR CODE HERE ("these are one liners")
+		// OUR CODE HERE ("these are one liners") - (COMPLETE)
+		println("ParamDecl:\t Declaring parameter '" + bl.paramName() + "'.");
+		currentScope.put(bl.name(), this);
 		return null;
 	}
 
 	/** (9) NAME EXPRESSION */
 	public Object visitNameExpr(NameExpr bl) {
-		// YOUR CODE HERE
+		// OUR CODE HERE
 		/**
 			Could be the name of: LocalDecal, ParamDecl, FieldDecl, ClassDecal
 			NAME EXPRESSION: has a field called myDecl, set it euqal to the result of the lookup we get from below:
@@ -276,7 +279,7 @@ public class NameChecker extends Visitor {
 
 	/** (10) INVOCATION */
 	public Object visitInvocation() {
-		// YOUR CODE HERE
+		// OUR CODE HERE
 		// INOCATION: expr.function(...)
 		// we will end up calling getMethod()
 		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
@@ -286,7 +289,7 @@ public class NameChecker extends Visitor {
 
 	/** (11) FIELD REFERENCE */
 	public Object visitFieldRef() {
-		// YOUR CODE HERE
+		// OUR CODE HERE
 		// we will end up calling getField()
 		// FIELD REF: expr.field
 		// - you will never be in the situation where the target of the fieldref is null
@@ -297,8 +300,8 @@ public class NameChecker extends Visitor {
 
 	/** (13) CLASS TYPE */
 	public Object visitClassType(ClassType bl) {
-		// YOUR CODE HERE ("these are one liners")
-		println("ClassType:\t  Looking up class/interface '" + bl.typeName() + "' in class table.");
+		// OUR CODE HERE ("these are one liners")
+		println("ClassType:\t Looking up class/interface '" + bl.typeName() + "' in class table.");
 		return null;
 	}
 
