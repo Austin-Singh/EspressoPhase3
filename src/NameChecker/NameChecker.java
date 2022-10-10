@@ -133,8 +133,14 @@ public class NameChecker extends Visitor {
 		// OUR CODE HERE (COMPLETE)
 		println("ConstructorDecl: Creating new scope for constructor <init> with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
-		super.visitConstructorDecl(bl);
-		currentScope = currentScope.closeScope(); 
+		super.visitSequence(bl.params());
+		currentScope = currentScope.newScope();
+		if (bl.cinvocation() != null) {
+			super.visitCInvocation(bl.cinvocation());
+		}
+		super.visitSequence(bl.body());
+		currentScope = currentScope.closeScope();
+		currentScope = currentScope.closeScope();
 		return null;
 	}
 
