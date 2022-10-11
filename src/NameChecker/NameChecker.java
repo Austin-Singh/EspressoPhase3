@@ -97,6 +97,7 @@ public class NameChecker extends Visitor {
 	*/
     public void checkReturnTypesOfIdenticalMethods(Sequence lst) {
 		// OUR CODE HERE
+    	
     }
     
     /* Divides all the methods into two sequences: one for all the
@@ -124,10 +125,12 @@ public class NameChecker extends Visitor {
 
 	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
 		// OUR CODE HERE
+		
 	}
     
 	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
 		// OUR CODE HERE
+		
 	}
 
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -351,23 +354,29 @@ public class NameChecker extends Visitor {
 	}
 
 	/** (10) INVOCATION */
-	public Object visitInvocation() {
+	public Object visitInvocation(Invocation in) {
 		// OUR CODE HERE
-		// INOCATION: expr.function(...)
+		// INVOCATION: expr.function(...)
 		// we will end up calling getMethod()
 		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
-		
+		Expression target = in.target();
+		if (target == null || target instanceof This) {
+			getMethod(in.methodName().getname(), currentClass);
+		}
 		return null;
 	}
 
 	/** (11) FIELD REFERENCE */
-	public Object visitFieldRef() {
+	public Object visitFieldRef(FieldRef fr) {
 		// OUR CODE HERE
 		// we will end up calling getField()
 		// FIELD REF: expr.field
 		// - you will never be in the situation where the target of the fieldref is null
 		// - expr can be anything only if it (target) is an instanceof this -> look in the table of currentClass (?)
-		
+		Expression target = fr.target();
+		if (target instanceof This) {
+			getField(fr.fieldName().getname(), currentClass);
+		}
 		return null;
 	}
 
