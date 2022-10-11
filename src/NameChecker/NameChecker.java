@@ -92,6 +92,11 @@ public class NameChecker extends Visitor {
 	    	// (1) takes in a CLASS as an empty sequence
 	    	// (2) builds a seqence of all the methods found in the ENTIRE class heirarchy
 	    	//	- class, super class, interfaces, super class of super class, etc.
+	    	// Espresso+:
+	    	// If a method does not have a body, and appears in a class, then:
+	    	// (1) the METHOD should be declared abstract.
+	    	// (2) the CLASS should be declared abstract.
+	    	// 	- abstract classes cannot have a constructor(s)
     }
 
 	/* For each method (not constructors) in this list, check that if
