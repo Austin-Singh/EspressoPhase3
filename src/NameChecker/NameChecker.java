@@ -87,8 +87,11 @@ public class NameChecker extends Visitor {
 	   of the methods and constructors of the class hierarchy.
 	 */
     public void getClassHierarchyMethods(ClassDecl cd, Sequence lst, Hashtable<String, Object> seenClasses) {
-		// OUR CODE HERE
-    	
+		// OUR CODE HERE - STILL TO FINISH
+	    
+	    	// (1) takes in a CLASS as an empty sequence
+	    	// (2) builds a seqence of all the methods found in the ENTIRE class heirarchy
+	    	//	- class, super class, interfaces, super class of super class, etc.
     }
 
 	/* For each method (not constructors) in this list, check that if
@@ -96,22 +99,55 @@ public class NameChecker extends Visitor {
        they all return something of the same type. 
 	*/
     public void checkReturnTypesOfIdenticalMethods(Sequence lst) {
-		// OUR CODE HERE
-    	
+		// OUR CODE HERE - STILL TO FINISH
+	    
+	    	// For each method (not constructors) traverses the class’ hierarchy and compares the return type with:
+	    	// (1) any method of the same name
+	    	// (2) any method of the same param signature
+	    	// (3) If reimplemented, throw an error.
+    		// We must assure a method has NOT been reimplemented with the same return type
     }
     
-    /* Divides all the methods into two sequences: one for all the
-       abstract ones, and one for all the concrete ones and check that
-       all the methods that were declared abstract were indeed
-       implemented somewhere in the class hierarchy.  */
+	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
+		// OUR CODE HERE - STILL TO FINISH
+		
+		// We need to assure every single abstract method or an interface method has:
+		// an implementation in the sequence of regular methods.
+		// We need to compare name, parameter signature and return type signature to assure that the implementation is valid.
+		
+		// Separate the sequence of methods from getClassHierarchyMethods() method into a sequence that contains:
+		// (1) all abstracts
+		// (2) all interface methods
+		// (3) all the regular methods with bodies.
+		// (4) If there is a method that does not have an implementation, throw an error.
+		
+	}
     
+	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
+		// OUR CODE HERE - STILL TO FINISH
+		
+		// In our language, we do not allow fields to be "reimplemented" in subclasses.
+		
+		// (1) insert all fields into the fields Sequence
+		// (2) call recursively on all super classes and interfaces
+		// 	- will traverse the field Sequence with each one of its fields to check
+		// 	if it is implemented in a sub class or a class that implement an interface.
+		// (3) If implemented, throw an error.
 
-    // sup is the class in which the abstract method lives,
-    // sub is the class in which the concrete method lives.
-    public static boolean isSuper(ClassDecl sup, ClassDecl sub) {
+	}
+	
+	/* Divides all the methods into two sequences: one for all the
+	abstract ones, and one for all the concrete ones and check that
+	all the methods that were declared abstract were indeed
+	implemented somewhere in the class hierarchy.  */
+
+
+	// sup is the class in which the abstract method lives,
+	// sub is the class in which the concrete method lives.
+	public static boolean isSuper(ClassDecl sup, ClassDecl sub) {
 		if (sup.name().equals(sub.name()))
 			return true;
-			
+
 		if (sub.superClass() != null && isSuper(sup, sub.superClass().myDecl))
 			return true;
 
@@ -120,19 +156,7 @@ public class NameChecker extends Visitor {
 			return true;
 
 		return false;
-    }
-
-
-	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
-		// OUR CODE HERE
-		
 	}
-    
-	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
-		// OUR CODE HERE
-		
-	}
-
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
