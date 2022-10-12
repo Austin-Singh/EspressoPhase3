@@ -168,24 +168,28 @@ public class NameChecker extends Visitor {
 	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
 
 		// goal: call recursively on all super classes and interfaces
+		Sequence classBodyDecls = cd.body();
+    	
+    	for (int i = 0; i < classBodyDecls.nchildren; i++) {
+    		if (classBodyDecls.children[i] instanceof FieldDecl) {
+    			for (int j = 0; j < fields.nchildren; j++) {
+    				if (((FieldDecl)fields.children[j]).name().equals(classBodyDecls.children[i])) {
+    					Error.error(((FieldDecl)fields.children[j]), "Field " + ((FieldDecl)fields.children[j]).name() + " already defined.");
+    				}
+    				fields.append(classBodyDecls.children[i]);
+    			}
+    		}
+    	}
+		
+		while(cd.superClass() != null){
+			checkUniqueFields(fields, cd.superClass().myDecl);
+		}
+		
 		while(cd.interfaces() != null){
 			for(int i = 0; i < cd.interfaces().nchildren; i++){
 				checkUniqueFields(fields, ((ClassType)cd.interfaces().children[i]).myDecl);
-				for(int j = 0; j < ((ClassType)cd.interfaces().children[i]).myDecl.fieldTable.entries.size(); j++){
-					// if the current field in the table exists, throw error
-					// otherwise, add it to the list
-				}
-			}
-			}
-		
-			while(cd.superClass() != null){
-			checkUniqueFields(fields, cd.superClass().myDecl);
-			for(int j = 0; j < cd.superClass().myDecl.fieldTable.entries.size(); j++){
-					// if the current field in the table exists, throw error
-					// otherwise, add it to the list
 			}
 		}
-	
 	}
 	
 	/* Divides all the methods into two sequences: one for all the
