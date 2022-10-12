@@ -87,7 +87,7 @@ public class NameChecker extends Visitor {
 	   of the methods and constructors of the class hierarchy.
 	 */
     public void getClassHierarchyMethods(ClassDecl cd, Sequence lst, Hashtable<String, Object> seenClasses) {
-		// OUR CODE HERE - STILL TO FINISH
+		// OUR CODE HERE - NON ESPRESSO+ PART COMPLETE
 	    
 	    	// (1) takes in a CLASS as an empty sequence
 	    	// (2) builds a seqence of all the methods found in the ENTIRE class heirarchy
@@ -97,6 +97,29 @@ public class NameChecker extends Visitor {
 	    	// (1) the METHOD should be declared abstract.
 	    	// (2) the CLASS should be declared abstract.
 	    	// 	- abstract classes cannot have a constructor(s)
+    	string className = cd.name();
+    	seenClasses.put(className, cd);
+    	
+    	Sequence classBodyDecls = cd.body();
+    	
+    	for (int i = 0; i < classBodyDecls.nchildren; i++) {
+    		if (classBodyDecls[i] instanceof MethodDecl) {
+    			lst.append(classBodyDecls[i]);
+    		}
+    	}
+    	
+    	if (cd.superClass() != null && seenClasses.get(cd.superClass().typeName()) == null) {
+    		String superClassName = cd.superClass().typeName();
+    		getClassHierarchyMethods(classTable.get(superClassName), lst, seenClasses);
+    	}
+    	
+    	if (cd.interfaces() != null) {
+    		Sequence interfaces = cd.interfaces();
+    		for (int i = 0; i <interfaces.nchildren; i++) {
+    			string interfaceName = interfaces.children[i].typeName();
+    			getClassHierarchyMethods(classTable.get(interfaceName), lst, seenClasses);
+    		}
+    	}
     }
 
 	/* For each method (not constructors) in this list, check that if
