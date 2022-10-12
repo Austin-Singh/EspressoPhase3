@@ -176,8 +176,8 @@ public class NameChecker extends Visitor {
     				if (((FieldDecl)fields.children[j]).name().equals(classBodyDecls.children[i])) {
     					Error.error(((FieldDecl)fields.children[j]), "Field " + ((FieldDecl)fields.children[j]).name() + " already defined.");
     				}
-    				fields.append(classBodyDecls.children[i]);
     			}
+    			fields.append(classBodyDecls.children[i]);
     		}
     	}
 		
