@@ -87,7 +87,7 @@ public class NameChecker extends Visitor {
 	   of the methods and constructors of the class hierarchy.
 	 */
     public void getClassHierarchyMethods(ClassDecl cd, Sequence lst, Hashtable<String, Object> seenClasses) {
-		// OUR CODE HERE - NON ESPRESSO+ PART COMPLETE
+		// OUR CODE HERE - NON-ESPRESSO+ PART COMPLETE
 	    
 	    	// (1) takes in a CLASS as an empty sequence
 	    	// (2) builds a seqence of all the methods found in the ENTIRE class heirarchy
@@ -129,11 +129,26 @@ public class NameChecker extends Visitor {
     public void checkReturnTypesOfIdenticalMethods(Sequence lst) {
 		// OUR CODE HERE - STILL TO FINISH
 	    
-	    	// For each method (not constructors) traverses the class’ hierarchy and compares the return type with:
+	    	// For each method (not constructors) traverses the class hierarchy and compares the return type with:
 	    	// (1) any method of the same name
 	    	// (2) any method of the same param signature
 	    	// (3) If reimplemented, throw an error.
     		// We must assure a method has NOT been reimplemented with the same return type
+    	for (int i = 0; i < lst.nchildren; i++) {
+    		for (int j = 0; j < lst.nchildren; j++) {
+    			String iName = lst[i].getname();
+    			String iSig = lst[i].paramSignature();
+    			String jName = lst[j].getname();
+    			String jSig = lst[j].paramSignature();
+    			if (iName.equals(jName) && iSig.equals(jSig)) {
+    				iType = lst[i].returnType.signature();
+    				jType = lst[j].returnType.signature();
+    				if !(iType.equals(jType)) {
+    					Error.error(lst[i], "Method " + lst[i].getname() + " re-implemented with incorrect type.");
+    				}
+    			}
+    		}
+    	}
     }
     
 	public void checkImplementationOfAbstractClasses(ClassDecl cd, Sequence methods) {
