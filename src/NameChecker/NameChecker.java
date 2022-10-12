@@ -155,17 +155,37 @@ public class NameChecker extends Visitor {
 		
 	}
     
-	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
-		// OUR CODE HERE - STILL TO FINISH
-		
-		// In our language, we do not allow fields to be "reimplemented" in subclasses.
-		
-		// (1) insert all fields into the fields Sequence
-		// (2) call recursively on all super classes and interfaces
-		// 	- will traverse the field Sequence with each one of its fields to check
-		// 	if it is implemented in a sub class or a class that implement an interface.
-		// (3) If implemented, throw an error.
+	// In our language, we do not allow fields to be "reimplemented" in subclasses.
+	// (1) insert all fields into the fields Sequence
+	// (2) call recursively on all super classes and interfaces
+	// 	- will traverse the field Sequence with each one of its fields to check
+	// 	if it is implemented in a sub class or a class that implement an interface.
+	// (3) If implemented, throw an error.
 
+	// (1) Traverse the class hierchy with a table
+	// (2) 	- if not already there, insert all fields
+	// (3)	- if there, throw an error.
+	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
+
+		// goal: call recursively on all super classes and interfaces
+		while(cd.interfaces() != null){
+			for(int i = 0; i < cd.interfaces().nchildren; i++){
+				checkUniqueFields(fields, ((ClassType)cd.interfaces().children[i]).myDecl);
+				for(int j = 0; j < ((ClassType)cd.interfaces().children[i]).myDecl.fieldTable.entries.size(); j++){
+				// if the current field in the table exists, throw error
+				// otherwise, add it to the list
+				}
+			}
+			}
+		
+			while(cd.superClass() != null){
+			checkUniqueFields(fields, cd.superClass().myDecl);
+			for(int j = 0; j < cd.superClass().myDecl.fieldTable.entries.size(); j++){
+				// if the current field in the table exists, throw error
+				// otherwise, add it to the list
+			}
+		}
+	
 	}
 	
 	/* Divides all the methods into two sequences: one for all the
