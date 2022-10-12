@@ -172,8 +172,8 @@ public class NameChecker extends Visitor {
 			for(int i = 0; i < cd.interfaces().nchildren; i++){
 				checkUniqueFields(fields, ((ClassType)cd.interfaces().children[i]).myDecl);
 				for(int j = 0; j < ((ClassType)cd.interfaces().children[i]).myDecl.fieldTable.entries.size(); j++){
-				// if the current field in the table exists, throw error
-				// otherwise, add it to the list
+					// if the current field in the table exists, throw error
+					// otherwise, add it to the list
 				}
 			}
 			}
@@ -181,8 +181,8 @@ public class NameChecker extends Visitor {
 			while(cd.superClass() != null){
 			checkUniqueFields(fields, cd.superClass().myDecl);
 			for(int j = 0; j < cd.superClass().myDecl.fieldTable.entries.size(); j++){
-				// if the current field in the table exists, throw error
-				// otherwise, add it to the list
+					// if the current field in the table exists, throw error
+					// otherwise, add it to the list
 			}
 		}
 	
