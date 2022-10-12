@@ -169,8 +169,8 @@ public class ClassAndMemberFinder extends Visitor {
 		// insert into current class's method table
 		println("FieldDecl:\t Inserting field '" + fd.getname() + "' into field table for class '" + currentClass.name() + "'");
 		addField(currentClass, fd, currentClass.name());
-		fd.fieldNumber = fieldNumber;
-		fieldNumber++;
+		fd.fieldNumber = fieldCounter;
+		fieldCounter++;
 		super.visitFieldDecl(fd);
 		return null;
 	}

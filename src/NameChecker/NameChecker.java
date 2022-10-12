@@ -32,8 +32,7 @@ public class NameChecker extends Visitor {
 			return (SymbolTable)cd.methodTable.get(methodName);
 		} 
 		else if (cd.superClass() != null) {
-			String superClassName = cd.superClass().typeName();
-			SymbolTable result = getMethod(methodName, classTable.get(superClassName));
+			SymbolTable result = getMethod(methodName, cd.superClass().myDecl);
 			if (result != null) {
 				return result;
 			}
@@ -41,16 +40,13 @@ public class NameChecker extends Visitor {
 		else if (cd.interfaces() != null) {
 			Sequence interfaces = cd.interfaces();
 			for (int i = 0; i < interfaces.nchildren; i++) {
-				string interfaceName = interfaces.children[i].typeName();
-				SymbolTable result = getMethod(methodName, classTable.get(interfaceName));
+				SymbolTable result = getMethod(methodName, ((ClassType)interfaces.children[i]).myDecl);
 				if (result != null) {
 					return result;
 				}
 			}
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 
 	/* Same as getMethod just for fields instead 
@@ -59,11 +55,10 @@ public class NameChecker extends Visitor {
 
 		// OUR CODE HERE - (COMPLETE)
 		if (cd.fieldTable.get(fieldName) != null) {
-			return (SymbolTable)cd.fieldTable.get(fieldName);
+			return (FieldDecl)cd.fieldTable.get(fieldName);
 		} 
 		else if (cd.superClass() != null) {
-			String superClassName = cd.superClass().typeName();
-			SymbolTable result = getField(fieldName, classTable.get(superClassName));
+			FieldDecl result = (FieldDecl)getField(fieldName, cd.superClass().myDecl);
 			if (result != null) {
 				return result;
 			}
@@ -71,16 +66,13 @@ public class NameChecker extends Visitor {
 		else if (cd.interfaces() != null) {
 			Sequence interfaces = cd.interfaces();
 			for (int i = 0; i < interfaces.nchildren; i++) {
-				string interfaceName = interfaces.children[i].typeName();
-				SymbolTable result = getField(fieldName, classTable.get(interfaceName));
+				FieldDecl result = (FieldDecl)getField(fieldName, ((ClassType)interfaces.children[i]).myDecl);
 				if (result != null) {
 					return result;
 				}
 			}
 		}
-		else {
-			return null;
-		}
+		return null;
 	}
 
 	/* Traverses all the classes and interfaces and builds a sequence
@@ -97,27 +89,24 @@ public class NameChecker extends Visitor {
 	    	// (1) the METHOD should be declared abstract.
 	    	// (2) the CLASS should be declared abstract.
 	    	// 	- abstract classes cannot have a constructor(s)
-    	string className = cd.name();
-    	seenClasses.put(className, cd);
+    	seenClasses.put(cd.name(), cd);
     	
     	Sequence classBodyDecls = cd.body();
     	
     	for (int i = 0; i < classBodyDecls.nchildren; i++) {
-    		if (classBodyDecls[i] instanceof MethodDecl) {
-    			lst.append(classBodyDecls[i]);
+    		if (classBodyDecls.children[i] instanceof MethodDecl) {
+    			lst.append(classBodyDecls.children[i]);
     		}
     	}
     	
     	if (cd.superClass() != null && seenClasses.get(cd.superClass().typeName()) == null) {
-    		String superClassName = cd.superClass().typeName();
-    		getClassHierarchyMethods(classTable.get(superClassName), lst, seenClasses);
+    		getClassHierarchyMethods(cd.superClass().myDecl, lst, seenClasses);
     	}
     	
     	if (cd.interfaces() != null) {
     		Sequence interfaces = cd.interfaces();
     		for (int i = 0; i <interfaces.nchildren; i++) {
-    			string interfaceName = interfaces.children[i].typeName();
-    			getClassHierarchyMethods(classTable.get(interfaceName), lst, seenClasses);
+    			getClassHierarchyMethods(cd.superClass().myDecl, lst, seenClasses);
     		}
     	}
     }
@@ -136,15 +125,15 @@ public class NameChecker extends Visitor {
     		// We must assure a method has NOT been reimplemented with the same return type
     	for (int i = 0; i < lst.nchildren; i++) {
     		for (int j = 0; j < lst.nchildren; j++) {
-    			String iName = lst[i].getname();
-    			String iSig = lst[i].paramSignature();
-    			String jName = lst[j].getname();
-    			String jSig = lst[j].paramSignature();
+    			String iName = ((MethodDecl)lst.children[i]).getname();
+    			String iSig = ((MethodDecl)lst.children[i]).paramSignature();
+    			String jName = ((MethodDecl)lst.children[j]).getname();
+    			String jSig = ((MethodDecl)lst.children[j]).paramSignature();
     			if (iName.equals(jName) && iSig.equals(jSig)) {
-    				iType = lst[i].returnType.signature();
-    				jType = lst[j].returnType.signature();
-    				if !(iType.equals(jType)) {
-    					Error.error(lst[i], "Method " + lst[i].getname() + " re-implemented with incorrect type.");
+    				String iType = ((MethodDecl)lst.children[i]).returnType().signature();
+    				String jType = ((MethodDecl)lst.children[j]).returnType().signature();
+    				if (!(iType.equals(jType))) {
+    					Error.error(lst.children[i], "Method " + ((MethodDecl)lst.children[i]).getname() + " re-implemented with incorrect type.");
     				}
     			}
     		}
@@ -378,7 +367,7 @@ public class NameChecker extends Visitor {
 
 	/** (9) NAME EXPRESSION */
 	public Object visitNameExpr(NameExpr bl) {
-		// OUR CODE HERE - (COMPLETE) should it just be objects?
+		// OUR CODE HERE - (COMPLETE)
 		/**
 			Could be the name of: LocalDecl, ParamDecl, FieldDecl, ClassDecal
 			NAME EXPRESSION: has a field called myDecl, set it equal to the result of the lookup we get from below:
@@ -395,27 +384,25 @@ public class NameChecker extends Visitor {
 			2) "Found Local Variable"
 		*/
 		println("NameExpr: Looking up symbol " + bl.name().getname());
-		Object obj = currentScope.get(bl.name().getname());
-		if (obj != null) {
+
+		if (currentScope.get(bl.name().getname()) != null && currentScope.get(bl.name().getname()) instanceof LocalDecl) {
 			println("Found Local Variable");
-			bl.myDecl = obj;
+			bl.myDecl = (LocalDecl)currentScope.get(bl.name().getname());
+		}
+		else if (currentScope.get(bl.name().getname()) != null && currentScope.get(bl.name().getname()) instanceof LocalDecl) {
+			println("Found Parameter Variable");
+			bl.myDecl = (ParamDecl)currentScope.get(bl.name().getname());
+		}
+		else if (currentClass.fieldTable.get(bl.name().getname()) != null) {
+			println("Found Field Variable");
+			bl.myDecl = (FieldDecl)currentClass.fieldTable.get(bl.name().getname());
+		} 
+		else if (classTable.get(bl.name().getname()) != null) {
+			println("Found Class Variable");
+			bl.myDecl = (ClassDecl)classTable.get(bl.name().getname());
 		}
 		else {
-			obj = currentClass.fieldTable.get(bl.name().getname());
-			if (obj != null) {
-				println("Found Field Variable");
-				bl.myDecl = obj;
-			} 
-			else {
-				obj = classTable.get(bl.name().getname());
-				if (obj != null) {
-					println("Found Class Variable");
-					bl.myDecl = obj;
-				} 
-				else {
-				Error.error(bl, "NameExpr: " + bl.name().getname() + " not found.");
-				}
-			}
+			Error.error(bl, "NameExpr: " + bl.name().getname() + " not found.");
 		}
 		return null;
 	}
