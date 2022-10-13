@@ -377,6 +377,8 @@ public class NameChecker extends Visitor {
 	public Object visitLocalDecl(LocalDecl bl) {
 		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("LocalDecl:\t Declaring local symbol '" + bl.var() + "'.");
+		bl.var().myDecl = bl;
+		super.visitLocalDecl(bl);
 		currentScope.put(bl.name(), this);
 		return null;
 	}
@@ -385,6 +387,7 @@ public class NameChecker extends Visitor {
 	public Object visitParamDecl(ParamDecl bl) {
 		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("ParamDecl:\t Declaring parameter '" + bl.paramName() + "'.");
+		super.visitParamDecl(bl);
 		currentScope.put(bl.name(), this);
 		return null;
 	}
@@ -407,27 +410,34 @@ public class NameChecker extends Visitor {
 			1) "NameExpr:        Looking up symbol 'a'."
 			2) "Found Local Variable"
 		*/
-		println("NameExpr: Looking up symbol " + bl.name().getname());
-
-		if (currentScope.get(bl.name().getname()) != null && currentScope.get(bl.name().getname()) instanceof LocalDecl) {
-			println("Found Local Variable");
-			bl.myDecl = (LocalDecl)currentScope.get(bl.name().getname());
-		}
-		else if (currentScope.get(bl.name().getname()) != null && currentScope.get(bl.name().getname()) instanceof LocalDecl) {
-			println("Found Parameter Variable");
-			bl.myDecl = (ParamDecl)currentScope.get(bl.name().getname());
-		}
-		else if (currentClass.fieldTable.get(bl.name().getname()) != null) {
-			println("Found Field Variable");
-			bl.myDecl = (FieldDecl)currentClass.fieldTable.get(bl.name().getname());
-		} 
-		else if (classTable.get(bl.name().getname()) != null) {
-			println("Found Class Variable");
-			bl.myDecl = (ClassDecl)classTable.get(bl.name().getname());
+		println("NameExpr:\t Looking up symbol '" + bl.name().getname() + "'.");
+		
+		AST decl = (AST)currentScope.get(bl.name().getname());
+		
+		if (decl != null) {
+			if(decl instanceof LocalDecl) {
+				println("Found Local Variable");
+			}
+			else if (decl instanceof ParamDecl) {
+				println("Found Parameter");
+			}
 		}
 		else {
-			Error.error(bl, "NameExpr: " + bl.name().getname() + " not found.");
+			decl = getField(bl.name().getname(), currentClass);
+			if (decl != null) {
+				println("Found Field");
+			}
+			else {
+				decl = (AST)classTable.get(bl.name().getname());
+				if (decl != null) {
+					println("Found Class");
+				}
+				else {
+					Error.error(bl, "Symbol '" + bl.name().getname() + "' not declared.");
+				}
+			}
 		}
+		bl.myDecl = decl;
 		return null;
 	}
 
@@ -439,8 +449,11 @@ public class NameChecker extends Visitor {
 		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
 		Expression target = in.target();
 		if (target == null || target instanceof This) {
-			getMethod(in.methodName().getname(), currentClass);
+			if (getMethod(in.methodName().getname(), currentClass) == null) {
+				Error.error(in, "Method " + in.methodName().getname() + " not found.");
+			}
 		}
+		super.visitInvocation(in);
 		return null;
 	}
 
@@ -453,8 +466,11 @@ public class NameChecker extends Visitor {
 		// - expr can be anything only if it (target) is an instanceof this -> look in the table of currentClass (?)
 		Expression target = fr.target();
 		if (target instanceof This) {
-			getField(fr.fieldName().getname(), currentClass);
+			if (getField(fr.fieldName().getname(), currentClass) == null) {
+				Error.error(fr, "Field " + fr.fieldName().getname() + " not found.");
+			}
 		}
+		super.visitFieldRef(fr);
 		return null;
 	}
 
@@ -462,7 +478,11 @@ public class NameChecker extends Visitor {
 	public Object visitClassType(ClassType bl) {
 		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("ClassType:\t Looking up class/interface '" + bl.typeName() + "' in class table.");
-		classTable.get(bl.typeName());
+		ClassDecl cd = (ClassDecl)classTable.get(bl.name().getname());
+		if (cd == null) {
+			Error.error(bl, "Class " + bl.name().getname() + " not found.");
+		}
+		bl.myDecl = cd;
 		return null;
 	}
 
