@@ -261,14 +261,31 @@ public class NameChecker extends Visitor {
 		// OUR CODE HERE (COMPLETE)
 		println("ConstructorDecl: Creating new scope for constructor <init> with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
-		super.visitSequence(bl.params());
-		currentScope = currentScope.newScope();
-		if (bl.cinvocation() != null) {
-			super.visitCInvocation(bl.cinvocation());
+		
+		if (currentClass.superClass() != null) {
+			if (bl.cinvocation() == null) {
+				if (!(currentClass.superClass().myDecl.modifiers.isAbstract())) {
+					if (!(currentClass.superClass().myDecl.isInterface())) {
+						bl.children[3] = (AST) new CInvocation(new Token(sym.SUPER, "super", 0, 0, 0), new Sequence());
+					}
+				}
+			}
 		}
-		super.visitSequence(bl.body());
+		
+		bl.params().visit(this);
+		
+		println("ConstructorDecl:\t Creating new scope for implicit block.");
+		currentScope = currentScope.newScope();
+		
+		if (bl.cinvocation() != null) {
+			bl.cinvocation().visit(this);
+		}
+		
+		bl.body().visit(this);
+		
 		currentScope = currentScope.closeScope();
 		currentScope = currentScope.closeScope();
+		
 		return null;
 	}
 
@@ -379,7 +396,7 @@ public class NameChecker extends Visitor {
 		println("LocalDecl:\t Declaring local symbol '" + bl.var() + "'.");
 		bl.var().myDecl = bl;
 		super.visitLocalDecl(bl);
-		currentScope.put(bl.name(), this);
+		currentScope.put(bl.name(), bl);
 		return null;
 	}
 
@@ -388,7 +405,7 @@ public class NameChecker extends Visitor {
 		// OUR CODE HERE ("these are one liners") - (COMPLETE)
 		println("ParamDecl:\t Declaring parameter '" + bl.paramName() + "'.");
 		super.visitParamDecl(bl);
-		currentScope.put(bl.name(), this);
+		currentScope.put(bl.name(), bl);
 		return null;
 	}
 
@@ -416,21 +433,21 @@ public class NameChecker extends Visitor {
 		
 		if (decl != null) {
 			if(decl instanceof LocalDecl) {
-				println("Found Local Variable");
+				println(" Found Local Variable");
 			}
 			else if (decl instanceof ParamDecl) {
-				println("Found Parameter");
+				println(" Found Parameter");
 			}
 		}
 		else {
 			decl = getField(bl.name().getname(), currentClass);
 			if (decl != null) {
-				println("Found Field");
+				println(" Found Field");
 			}
 			else {
 				decl = (AST)classTable.get(bl.name().getname());
 				if (decl != null) {
-					println("Found Class");
+					println(" Found Class");
 				}
 				else {
 					Error.error(bl, "Symbol '" + bl.name().getname() + "' not declared.");
