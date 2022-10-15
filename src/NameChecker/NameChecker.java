@@ -165,7 +165,7 @@ public class NameChecker extends Visitor {
 	// (1) Traverse the class hierchy with a table
 	// (2) 	- if not already there, insert all fields
 	// (3)	- if there, throw an error.
-	public  void checkUniqueFields(Sequence fields, ClassDecl cd) {
+	public void checkUniqueFields(Sequence fields, ClassDecl cd) {
 
 		// goal: call recursively on all super classes and interfaces
 		Sequence classBodyDecls = cd.body();
@@ -181,14 +181,12 @@ public class NameChecker extends Visitor {
     		}
     	}
 		
-		while(cd.superClass() != null){
+		if (cd.superClass() != null){
 			checkUniqueFields(fields, cd.superClass().myDecl);
 		}
 		
-		while(cd.interfaces() != null){
-			for(int i = 0; i < cd.interfaces().nchildren; i++){
-				checkUniqueFields(fields, ((ClassType)cd.interfaces().children[i]).myDecl);
-			}
+		for(int i = 0; i < cd.interfaces().nchildren; i++) {
+			checkUniqueFields(fields, ((ClassType)cd.interfaces().children[i]).myDecl);
 		}
 	}
 	
@@ -249,7 +247,7 @@ public class NameChecker extends Visitor {
 	/** (2) FOR STAT */
 	public Object visitForStat(ForStat bl) {
 		// OUR CODE HERE (COMPLETE)
-		println("ForStat:\t\t Creating new scope for For Statement.");
+		println("ForStat:\t Creating new scope for For Statement.");
 		currentScope = currentScope.newScope();
 		super.visitForStat(bl);
 		currentScope = currentScope.closeScope(); 
@@ -262,19 +260,8 @@ public class NameChecker extends Visitor {
 		println("ConstructorDecl: Creating new scope for constructor <init> with signature '" + bl.paramSignature() + "' (Parameters and Locals).");
 		currentScope = currentScope.newScope();
 		
-		if (currentClass.superClass() != null) {
-			if (bl.cinvocation() == null) {
-				if (!(currentClass.superClass().myDecl.modifiers.isAbstract())) {
-					if (!(currentClass.superClass().myDecl.isInterface())) {
-						bl.children[3] = (AST) new CInvocation(new Token(sym.SUPER, "super", 0, 0, 0), new Sequence());
-					}
-				}
-			}
-		}
-		
 		bl.params().visit(this);
 		
-		println("ConstructorDecl:\t Creating new scope for implicit block.");
 		currentScope = currentScope.newScope();
 		
 		if (bl.cinvocation() != null) {
@@ -357,9 +344,9 @@ public class NameChecker extends Visitor {
 		Sequence methods = new Sequence();
 		
 		getClassHierarchyMethods(cd, methods, seenClasses);
-
+		
 		checkReturnTypesOfIdenticalMethods(methods);
-
+		
 		// If the class is not abstract and not an interface it must implement all
 		// the abstract functions of its superclass(es) and its interfaces.
 		if (!cd.isInterface() && !cd.modifiers.isAbstract()) {
@@ -368,7 +355,7 @@ public class NameChecker extends Visitor {
 		}
 		// All field names can only be used once in a class hierarchy
 		checkUniqueFields(new Sequence(), cd);
-
+		
 		cd.allMethods = methods; // now contains only MethodDecls
 
 		// Fill cd.constructors.

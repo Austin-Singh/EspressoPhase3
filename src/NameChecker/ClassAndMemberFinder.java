@@ -158,7 +158,7 @@ public class ClassAndMemberFinder extends Visitor {
 	/** (3) METHOD DECLARATION */
 	public Object visitMethodDecl(MethodDecl md) {
 		// insert into current class's method table
-		println("MethodDecl:\t Inserting method '" + md.getname() + "' with signature '" + md.paramSignature() + "' into method table for class '" + currentClass.name() + "'");
+		println("MethodDecl:\t Inserting method '" + md.getname() + "' with signature '" + md.paramSignature() + "' into method table for class '" + currentClass.name() + "'.");
 		addMethod(currentClass, md, md.getname(), md.paramSignature());
 		super.visitMethodDecl(md);
 		return null;
