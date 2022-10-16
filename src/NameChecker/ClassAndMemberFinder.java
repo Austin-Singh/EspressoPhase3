@@ -125,7 +125,7 @@ public class ClassAndMemberFinder extends Visitor {
 
 		// Visit the children
 		super.visitClassDecl(cd);
-
+		
 		// If there are not constructors at all - insert the default -
 		// don't actually make any parse tree stuff - just generate
 		// the code automatically in the code generation phase.
@@ -138,7 +138,9 @@ public class ClassAndMemberFinder extends Visitor {
 					new Sequence(),
 					null,
 					new Sequence());
+			
 			addMethod(cd, c, "<init>", "");
+			
 			cd.body().append(c);
 			println("ClassDecl:\t Generating default construction <init>() for class '" + cd.name() + "'");
 		}
@@ -149,7 +151,7 @@ public class ClassAndMemberFinder extends Visitor {
 	/** (2) CONSTRUCTOR DECLARATION */
 	public Object visitConstructorDecl(ConstructorDecl cd) {
 		// insert into current class's method table
-		println("ConstructorDecl: Inserting constructor '<init>' with signature '" + cd.paramSignature() + "' (Parameters and Locals).");
+		println("ConstructorDecl: Inserting constructor '<init>' with signature '" + cd.paramSignature() + "' into method table for class '" + currentClass.name() + "'.");
 		addMethod(currentClass, cd, "<init>", cd.paramSignature());
 		super.visitConstructorDecl(cd);
 		return null;
@@ -167,8 +169,8 @@ public class ClassAndMemberFinder extends Visitor {
 	/** (4) FIELD DECLARATION */
 	public Object visitFieldDecl(FieldDecl fd) {
 		// insert into current class's method table
-		println("FieldDecl:\t Inserting field '" + fd.getname() + "' into field table for class '" + currentClass.name() + "'");
-		addField(currentClass, fd, currentClass.name());
+		println("FieldDecl:\t Inserting field '" + fd.getname() + "' into field table of class '" + currentClass.name() + "'.");
+		addField(currentClass, fd, fd.getname());
 		fd.fieldNumber = fieldCounter;
 		fieldCounter++;
 		super.visitFieldDecl(fd);

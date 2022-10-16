@@ -418,29 +418,30 @@ public class NameChecker extends Visitor {
 		
 		AST decl = (AST)currentScope.get(bl.name().getname());
 		
-		if (decl != null) {
-			if(decl instanceof LocalDecl) {
-				println(" Found Local Variable");
-			}
-			else if (decl instanceof ParamDecl) {
-				println(" Found Parameter");
-			}
-		}
-		else {
+		if (decl == null) {
 			decl = getField(bl.name().getname(), currentClass);
-			if (decl != null) {
-				println(" Found Field");
-			}
-			else {
-				decl = (AST)classTable.get(bl.name().getname());
-				if (decl != null) {
-					println(" Found Class");
-				}
-				else {
-					Error.error(bl, "Symbol '" + bl.name().getname() + "' not declared.");
-				}
+		}
+		
+		if (decl == null) {
+			decl = (AST)classTable.get(bl.name().getname());
+			if (decl == null) {
+				Error.error(bl, "Symbol '" + bl.name().getname() + "' not declared.");
 			}
 		}
+		
+		if (decl instanceof LocalDecl) {
+			println(" Found Local Variable");
+		}
+		else if (decl instanceof ParamDecl) {
+			println(" Found Parameter");
+		}
+		else if (decl instanceof FieldDecl) {
+			println(" Found Field");
+		}
+		else if (decl instanceof ClassDecl) {
+			println(" Found Class");
+		}
+		
 		bl.myDecl = decl;
 		return null;
 	}
@@ -453,9 +454,13 @@ public class NameChecker extends Visitor {
 		// - expr can be anything only if it (target) is null or an instanceof this -> look in the table of currentClass
 		Expression target = in.target();
 		if (target == null || target instanceof This) {
+			println("Invocation:\t Looking up method '" + in.methodName().getname() + "'.");
 			if (getMethod(in.methodName().getname(), currentClass) == null) {
 				Error.error(in, "Method " + in.methodName().getname() + " not found.");
 			}
+		}
+		else {
+			println("Invocation:\t Target too complicated for now!");
 		}
 		super.visitInvocation(in);
 		return null;
