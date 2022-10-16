@@ -173,7 +173,7 @@ public class NameChecker extends Visitor {
     	for (int i = 0; i < classBodyDecls.nchildren; i++) {
     		if (classBodyDecls.children[i] instanceof FieldDecl) {
     			for (int j = 0; j < fields.nchildren; j++) {
-    				if (((FieldDecl)fields.children[j]).name().equals(classBodyDecls.children[i])) {
+    				if (((FieldDecl)fields.children[j]).name().equals(((FieldDecl)classBodyDecls.children[i]).getname())) {
     					Error.error(((FieldDecl)fields.children[j]), "Field " + ((FieldDecl)fields.children[j]).name() + " already defined.");
     				}
     			}
